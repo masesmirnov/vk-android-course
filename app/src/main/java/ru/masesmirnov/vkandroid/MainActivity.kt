@@ -1,8 +1,13 @@
 package ru.masesmirnov.vkandroid
 
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.util.Patterns
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
@@ -24,11 +29,21 @@ class MainActivity : AppCompatActivity() {
 
         input = findViewById(R.id.input)
         findViewById<Button>(R.id.open_second_button).setOnClickListener { openSecondActivity() }
+        findViewById<Button>(R.id.call_friend_button).setOnClickListener { callFriend() }
     }
 
     private fun openSecondActivity() {
         val text = validInput(R.string.error_empty_text, String::isNotEmpty) ?: return
         startActivity(SecondActivity.newIntent(this, text))
+    }
+
+    private fun callFriend() {
+        val phone = validInput(R.string.error_invalid_phone) { Patterns.PHONE.matcher(it).matches() } ?: return
+        try {
+            startActivity(Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", phone, null)))
+        } catch (e: ActivityNotFoundException) {
+            Toast.makeText(this, R.string.error_no_dialer, Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun validInput(@StringRes errorRes: Int, isValid: (String) -> Boolean): String? {
