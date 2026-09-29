@@ -30,6 +30,7 @@ class MainActivity : AppCompatActivity() {
         input = findViewById(R.id.input)
         findViewById<Button>(R.id.open_second_button).setOnClickListener { openSecondActivity() }
         findViewById<Button>(R.id.call_friend_button).setOnClickListener { callFriend() }
+        findViewById<Button>(R.id.share_text_button).setOnClickListener { shareText() }
     }
 
     private fun openSecondActivity() {
@@ -44,6 +45,15 @@ class MainActivity : AppCompatActivity() {
         } catch (e: ActivityNotFoundException) {
             Toast.makeText(this, R.string.error_no_dialer, Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun shareText() {
+        val text = validInput(R.string.error_empty_text, String::isNotEmpty) ?: return
+        val sendIntent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, text)
+        }
+        startActivity(Intent.createChooser(sendIntent, getString(R.string.share_via)))
     }
 
     private fun validInput(@StringRes errorRes: Int, isValid: (String) -> Boolean): String? {
